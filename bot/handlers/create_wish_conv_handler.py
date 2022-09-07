@@ -7,6 +7,8 @@ from telegram.ext import (
     CallbackContext,
 )
 
+from bot.utils import create_wish_item
+
 CHOOSING, TYPING_REPLY, TYPING_CHOICE = range(3)
 
 REPLY_KEYBOARD = [
@@ -31,7 +33,6 @@ def start(update: Update, context: CallbackContext) -> int:
         'Tell me more about your dream?'
     )
     update.message.reply_text(text, reply_markup=MARKUP)
-
     return CHOOSING
 
 
@@ -64,18 +65,19 @@ def received_information(update: Update, context: CallbackContext) -> int:
 
 def done(update: Update, context: CallbackContext) -> int:
     """Display the gathered info and end the conversation."""
-    user_data = context.user_data
-    if 'choice' in user_data:
-        del user_data['choice']
+    wish_item_info = context.user_data
+    if 'choice' in wish_item_info:
+        del wish_item_info['choice']
 
     text = str(
         'Your new wish looks like:\n'
-        f'{facts_to_str(user_data)}\n'
+        f'{facts_to_str(wish_item_info)}\n'
         'I have saved this info but you can edit it at any time.'
     )
     update.message.reply_text(text, reply_markup=ReplyKeyboardRemove())
+    create_wish_item(wish_item_info, update.message.from_user)
+    wish_item_info.clear()
 
-    user_data.clear()
     return ConversationHandler.END
 
 

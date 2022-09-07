@@ -9,7 +9,8 @@ from django.conf import settings
 from telegram import Bot, Update
 
 from bot.apps import BotConfig
-from bot.handlers import new_wish_conv_handler
+from bot.handlers.create_wish_conv_handler import new_wish_conv_handler
+from bot.handlers.start_handler import start_handler
 
 
 @csrf_exempt
@@ -19,6 +20,7 @@ def process(request):
     dispatcher = BotConfig.dispatcher
 
     # Register handlers here
+    dispatcher.add_handler(start_handler)
     dispatcher.add_handler(new_wish_conv_handler)
 
     # Start the thread
