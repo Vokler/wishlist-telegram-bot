@@ -1,4 +1,8 @@
 import json
+
+from queue import Queue
+from threading import Thread
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -14,10 +18,17 @@ def start(update, context):
 @csrf_exempt
 def process(request):
     bot = Bot(settings.BOT_TOKEN)
-    dispatcher = Dispatcher(bot, None, workers=0)
-    dispatcher.process_update(Update.de_json(json.loads(request.body.decode()), bot))
+    update_queue = Queue()
+    dispatcher = Dispatcher(bot, update_queue)
 
+    # Register handlers here
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
+
+    # Start the thread
+    thread = Thread(target=dispatcher.start, name='dispatcher')
+    thread.start()
+
+    update_queue.put(Update.de_json(json.loads(request.body.decode()), bot))
 
     return JsonResponse({})
