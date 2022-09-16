@@ -10,7 +10,7 @@ from telegram import Bot, Update
 
 from bot.apps import BotConfig
 from bot.handlers.create_wish_conv_handler import new_wish_conv_handler
-from bot.handlers.start_handler import start_handler
+from bot.handlers.start import start_handler
 
 
 @csrf_exempt
