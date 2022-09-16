@@ -2,7 +2,7 @@ from telegram.ext import CommandHandler
 from telegram.constants import PARSEMODE_HTML
 
 from bot.utils import get_or_create_user
-from bot.commands import WishListBotCommands
+from bot.common import WishListBotCommands
 
 
 def start(update, context):
