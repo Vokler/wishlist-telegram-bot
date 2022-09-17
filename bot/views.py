@@ -11,6 +11,8 @@ from telegram import Bot, Update
 from bot.apps import BotConfig
 from bot.handlers.start import start_handler
 from bot.handlers.new_wish import new_wish_conv_handler
+from bot.handlers.my_wishes import conv_handler
+from bot.handlers.draft import my_wishes_conv_handler
 
 
 @csrf_exempt
@@ -22,6 +24,8 @@ def process(request):
     # Register handlers here
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(new_wish_conv_handler)
+    dispatcher.add_handler(my_wishes_conv_handler)
+    # dispatcher.add_handler(conv_handler)
 
     # Start the thread
     thread = Thread(target=dispatcher.start, name='dispatcher')
