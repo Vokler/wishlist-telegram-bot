@@ -3,6 +3,8 @@ from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
     ConversationHandler,
+    MessageHandler,
+    Filters,
 )
 
 from django.contrib.auth.models import User
@@ -13,6 +15,48 @@ from bot.common import MyWishesStages, MyWishesCallback
 
 stages = MyWishesStages
 callback = MyWishesCallback
+
+
+class WishItemUpdate:
+    UPDATING_FIELD = 'updating-field'
+
+    def start(self, update, context):
+        query = update.callback_query
+        query.answer()
+        field = self._get_editable_field(query.data)
+        context.chat_data.update({
+            'field': field,
+            'wish_item_id': self._get_wish_item_id(query.data),
+        })
+
+        text = str(f'OK. Send me the new {field} for your wish.')
+        query.edit_message_text(text)
+        return self.UPDATING_FIELD
+
+    def update(self, update, context):
+        new_value = update.message.text
+        field = context.chat_data['field']
+        obj_id = context.chat_data['wish_item_id']
+
+        keyboard = [
+            [
+                InlineKeyboardButton('« Back to Wish', callback_data=f'{callback.BACK_TO_WISH_ITEM.value}{obj_id}'),
+                # InlineKeyboardButton('« Back to Wish List', callback_data=callback.BACK_TO_WISH_ITEMS_LIST.value)
+            ]
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str(f'Success! The {field} updated.')
+        update.message.reply_text(text, reply_markup=reply_markup)
+        return stages.WISH_ITEM_UPDATE.value
+
+    def _get_editable_field(self, data):
+        field = data.split('-')[2]
+        return field
+
+    def _get_wish_item_id(self, data):
+        id = data.split('-')[1]
+        return id
 
 
 class MyWishesCommand:
@@ -66,11 +110,11 @@ class MyWishesCommand:
 
         keyboard = [
             [
-                InlineKeyboardButton('Edit Title', callback_data='edit-title'),
-                InlineKeyboardButton('Edit Image', callback_data='edit-image')
+                InlineKeyboardButton('Edit Title', callback_data=f'edit-{wish_item_id}-title'),
+                InlineKeyboardButton('Edit Image', callback_data=f'edit-{wish_item_id}-image')
             ],
             [
-                InlineKeyboardButton('Edit Url', callback_data='edit-url')
+                InlineKeyboardButton('Edit Url', callback_data=f'edit-{wish_item_id}-url')
             ],
             [
                 InlineKeyboardButton('« Back to Wish', callback_data=self._get_wish_item_pattern(wish_item_id))
@@ -116,6 +160,8 @@ class MyWishesCommand:
 
 
 cmd = MyWishesCommand()
+wish_item_update = WishItemUpdate()
+
 my_wishes_conv_handler = ConversationHandler(
     entry_points=[CommandHandler('my_wishes', cmd.start)],
     states={
@@ -131,7 +177,14 @@ my_wishes_conv_handler = ConversationHandler(
             CallbackQueryHandler(cmd.wish_items_list, pattern=callback.BACK_TO_WISH_ITEMS_LIST.value)
         ],
         stages.WISH_ITEM_UPDATE.value: [
-            CallbackQueryHandler(cmd.wish_item, pattern=f'^{callback.BACK_TO_WISH_ITEM.value}[0-9]+$')
+            CallbackQueryHandler(cmd.wish_item, pattern=f'^{callback.BACK_TO_WISH_ITEM.value}[0-9]+$'),
+            CallbackQueryHandler(wish_item_update.start, pattern='^edit-[0-9]+-[a-z]+$')
+        ],
+
+        # WishItemUpdate
+        wish_item_update.UPDATING_FIELD: [
+            MessageHandler(Filters.text, wish_item_update.update),
+            CallbackQueryHandler(cmd.wish_item, pattern=f'^{callback.BACK_TO_WISH_ITEM.value}[0-9]+$'),
         ]
     },
     fallbacks=[CommandHandler('start', start_handler)]
