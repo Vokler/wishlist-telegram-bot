@@ -1,4 +1,4 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     CommandHandler,
     CallbackQueryHandler,
@@ -9,22 +9,19 @@ from django.contrib.auth.models import User
 
 from bot.models import WishListItem
 from bot.handlers.start import start_handler
+from bot.common import MyWishesStages, MyWishesCallback
+
+stages = MyWishesStages
+callback = MyWishesCallback
 
 
 class MyWishesCommand:
-    # stages
-    WISH_ITEMS_LIST, WISH_ITEM_SETTINGS, WISH_ITEM_UPDATE, WISH_ITEM_DELETE = range(4)
-
-    # callback data
-    BACK_TO_WISH_ITEMS_LIST = 'back-to-wish-items-list'
-    BACK_TO_WISH_ITEM = 'get-'
-
     def start(self, update, context):
         keyboard = self._get_wish_items_inline_keyboard()
         reply_markup = InlineKeyboardMarkup(keyboard)
         text = str('Choose a wish from the list below:')
         update.message.reply_text(text, reply_markup=reply_markup)
-        return self.WISH_ITEMS_LIST
+        return stages.WISH_ITEMS_LIST.value
 
     def wish_items_list(self, update, context):
         query = update.callback_query
@@ -34,7 +31,7 @@ class MyWishesCommand:
         reply_markup = InlineKeyboardMarkup(keyboard)
         text = str('Choose a wish from the list below:')
         query.edit_message_text(text, reply_markup=reply_markup)
-        return self.WISH_ITEMS_LIST
+        return stages.WISH_ITEMS_LIST.value
 
     def wish_item(self, update, context):
         query = update.callback_query
@@ -48,7 +45,7 @@ class MyWishesCommand:
                 InlineKeyboardButton('Delete Wish', callback_data=f'delete-{wish_item.id}'),
             ],
             [
-                InlineKeyboardButton('« Back to Wish List', callback_data=self.BACK_TO_WISH_ITEMS_LIST),
+                InlineKeyboardButton('« Back to Wish List', callback_data=callback.BACK_TO_WISH_ITEMS_LIST.value),
             ]
         ]
 
@@ -58,7 +55,7 @@ class MyWishesCommand:
             'What do you want to do with this wish?'
         )
         query.edit_message_text(text, reply_markup=reply_markup)
-        return self.WISH_ITEM_SETTINGS
+        return stages.WISH_ITEM_SETTINGS.value
 
     def wish_item_update(self, update, context):
         query = update.callback_query
@@ -82,7 +79,7 @@ class MyWishesCommand:
         reply_markup = InlineKeyboardMarkup(keyboard)
         text = str(f'Edit {wish_item.title} info.')
         query.edit_message_text(text, reply_markup=reply_markup)
-        return self.WISH_ITEM_UPDATE
+        return stages.WISH_ITEM_UPDATE.value
 
     def wish_item_delete(self, update, context):
         query = update.callback_query
@@ -92,12 +89,12 @@ class MyWishesCommand:
         # wish_item.delete() # todo: uncomment
 
         keyboard = [
-            [InlineKeyboardButton('« Back to Wish List', callback_data=self.BACK_TO_WISH_ITEMS_LIST)],
+            [InlineKeyboardButton('« Back to Wish List', callback_data=callback.BACK_TO_WISH_ITEMS_LIST.value)],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         text = str(f'You have deleted {wish_item.title}.')
         query.edit_message_text(text, reply_markup=reply_markup)
-        return self.WISH_ITEM_DELETE
+        return stages.WISH_ITEM_DELETE.value
 
     def _get_wish_items_inline_keyboard(self):
         user = User.objects.get(username='vokler')  # todo: replace on a real user
@@ -114,7 +111,7 @@ class MyWishesCommand:
         return wish_item_id
 
     def _get_wish_item_pattern(self, wish_item_id):
-        pattern = f'{self.BACK_TO_WISH_ITEM}{wish_item_id}'
+        pattern = f'{callback.BACK_TO_WISH_ITEM.value}{wish_item_id}'
         return pattern
 
 
@@ -122,19 +119,19 @@ cmd = MyWishesCommand()
 my_wishes_conv_handler = ConversationHandler(
     entry_points=[CommandHandler('my_wishes', cmd.start)],
     states={
-        cmd.WISH_ITEMS_LIST: [
+        stages.WISH_ITEMS_LIST.value: [
             CallbackQueryHandler(cmd.wish_item),
         ],
-        cmd.WISH_ITEM_SETTINGS: [
+        stages.WISH_ITEM_SETTINGS.value: [
             CallbackQueryHandler(cmd.wish_item_update, pattern='^edit-[0-9]+$'),
             CallbackQueryHandler(cmd.wish_item_delete, pattern='^delete-[0-9]+$'),
-            CallbackQueryHandler(cmd.wish_items_list, pattern=cmd.BACK_TO_WISH_ITEMS_LIST),
+            CallbackQueryHandler(cmd.wish_items_list, pattern=callback.BACK_TO_WISH_ITEMS_LIST.value),
         ],
-        cmd.WISH_ITEM_DELETE: [
-            CallbackQueryHandler(cmd.wish_items_list, pattern=cmd.BACK_TO_WISH_ITEMS_LIST)
+        stages.WISH_ITEM_DELETE.value: [
+            CallbackQueryHandler(cmd.wish_items_list, pattern=callback.BACK_TO_WISH_ITEMS_LIST.value)
         ],
-        cmd.WISH_ITEM_UPDATE: [
-            CallbackQueryHandler(cmd.wish_item, pattern=f'^{cmd.BACK_TO_WISH_ITEM}[0-9]+$')
+        stages.WISH_ITEM_UPDATE.value: [
+            CallbackQueryHandler(cmd.wish_item, pattern=f'^{callback.BACK_TO_WISH_ITEM.value}[0-9]+$')
         ]
     },
     fallbacks=[CommandHandler('start', start_handler)]
