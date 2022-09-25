@@ -118,23 +118,23 @@ class MyWishesCommand:
         return pattern
 
 
-my_wishes_cmd = MyWishesCommand()
+cmd = MyWishesCommand()
 my_wishes_conv_handler = ConversationHandler(
-    entry_points=[CommandHandler('my_wishes', my_wishes_cmd.start)],
+    entry_points=[CommandHandler('my_wishes', cmd.start)],
     states={
-        my_wishes_cmd.WISH_ITEMS_LIST: [
-            CallbackQueryHandler(my_wishes_cmd.wish_item),
+        cmd.WISH_ITEMS_LIST: [
+            CallbackQueryHandler(cmd.wish_item),
         ],
-        my_wishes_cmd.WISH_ITEM_SETTINGS: [
-            CallbackQueryHandler(my_wishes_cmd.wish_item_update, pattern='^edit-[0-9]+$'),
-            CallbackQueryHandler(my_wishes_cmd.wish_item_delete, pattern='^delete-[0-9]+$'),
-            CallbackQueryHandler(my_wishes_cmd.wish_items_list, pattern=my_wishes_cmd.BACK_TO_WISH_ITEMS_LIST),
+        cmd.WISH_ITEM_SETTINGS: [
+            CallbackQueryHandler(cmd.wish_item_update, pattern='^edit-[0-9]+$'),
+            CallbackQueryHandler(cmd.wish_item_delete, pattern='^delete-[0-9]+$'),
+            CallbackQueryHandler(cmd.wish_items_list, pattern=cmd.BACK_TO_WISH_ITEMS_LIST),
         ],
-        my_wishes_cmd.WISH_ITEM_DELETE: [
-            CallbackQueryHandler(my_wishes_cmd.wish_items_list, pattern=my_wishes_cmd.BACK_TO_WISH_ITEMS_LIST)
+        cmd.WISH_ITEM_DELETE: [
+            CallbackQueryHandler(cmd.wish_items_list, pattern=cmd.BACK_TO_WISH_ITEMS_LIST)
         ],
-        my_wishes_cmd.WISH_ITEM_UPDATE: [
-            CallbackQueryHandler(my_wishes_cmd.wish_item, pattern=my_wishes_cmd.BACK_TO_WISH_ITEM)
+        cmd.WISH_ITEM_UPDATE: [
+            CallbackQueryHandler(cmd.wish_item, pattern=f'^{cmd.BACK_TO_WISH_ITEM}[0-9]+$')
         ]
     },
     fallbacks=[CommandHandler('start', start_handler)]
