@@ -1,154 +1,191 @@
-import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
-    Updater,
     CommandHandler,
     CallbackQueryHandler,
     ConversationHandler,
-    CallbackContext,
+    MessageHandler,
+    Filters,
 )
 
-# Stages
-FIRST, SECOND = range(2)
-# Callback data
-ONE, TWO, THREE, FOUR = range(4)
+from django.contrib.auth.models import User
+
+from bot.models import WishListItem
+from bot.handlers.start import start_handler
+from bot.common import MyWishesStages, MyWishesCallback
+
+stages = MyWishesStages
+callback = MyWishesCallback
 
 
-def start(update: Update, context: CallbackContext) -> int:
-    """Send message on `/start`."""
-    # Get user that sent /start and log his name
-    user = update.message.from_user
-    print("User %s started the conversation.", user.first_name)
-    # Build InlineKeyboard where each button has a displayed text
-    # and a string as callback_data
-    # The keyboard is a list of button rows, where each row is in turn
-    # a list (hence `[[...]]`).
-    keyboard = [
-        [
-            InlineKeyboardButton("1", callback_data=str(ONE)),
-            InlineKeyboardButton("2", callback_data=str(TWO)),
+class WishItemUpdate:
+    UPDATING_FIELD = 'updating-field'
+
+    def start(self, update, context):
+        query = update.callback_query
+        query.answer()
+        field = self._get_editable_field(query.data)
+        context.chat_data.update({
+            'field': field,
+            'wish_item_id': self._get_wish_item_id(query.data),
+        })
+
+        text = str(f'OK. Send me the new {field} for your wish.')
+        query.edit_message_text(text)
+        return self.UPDATING_FIELD
+
+    def update(self, update, context):
+        new_value = update.message.text
+        field = context.chat_data['field']
+        obj_id = context.chat_data['wish_item_id']
+
+        keyboard = [
+            [
+                InlineKeyboardButton('« Back to Wish', callback_data=f'{callback.BACK_TO_WISH_ITEM.value}{obj_id}'),
+                # InlineKeyboardButton('« Back to Wish List', callback_data=callback.BACK_TO_WISH_ITEMS_LIST.value)
+            ]
         ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    # Send message with text and appended InlineKeyboard
-    update.message.reply_text("Start handler, Choose a route", reply_markup=reply_markup)
-    # Tell ConversationHandler that we're in state `FIRST` now
-    return FIRST
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str(f'Success! The {field} updated.')
+        update.message.reply_text(text, reply_markup=reply_markup)
+        return stages.WISH_ITEM_UPDATE.value
+
+    def _get_editable_field(self, data):
+        field = data.split('-')[2]
+        return field
+
+    def _get_wish_item_id(self, data):
+        id = data.split('-')[1]
+        return id
 
 
-def start_over(update: Update, context: CallbackContext) -> int:
-    """Prompt same text & keyboard as `start` does but not as new message"""
-    # Get CallbackQuery from Update
-    query = update.callback_query
-    # CallbackQueries need to be answered, even if no notification to the user is needed
-    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
-    query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("1", callback_data=str(ONE)),
-            InlineKeyboardButton("2", callback_data=str(TWO)),
+class MyWishesCommand:
+    def start(self, update, context):
+        keyboard = self._get_wish_items_inline_keyboard()
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str('Choose a wish from the list below:')
+        update.message.reply_text(text, reply_markup=reply_markup)
+        return stages.WISH_ITEMS_LIST.value
+
+    def wish_items_list(self, update, context):
+        query = update.callback_query
+        query.answer()
+
+        keyboard = self._get_wish_items_inline_keyboard()
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str('Choose a wish from the list below:')
+        query.edit_message_text(text, reply_markup=reply_markup)
+        return stages.WISH_ITEMS_LIST.value
+
+    def wish_item(self, update, context):
+        query = update.callback_query
+        query.answer()
+
+        wish_item = WishListItem.objects.get(id=self._get_wish_item_id(query.data))
+
+        keyboard = [
+            [
+                InlineKeyboardButton('Edit Wish', callback_data=f'edit-{wish_item.id}'),
+                InlineKeyboardButton('Delete Wish', callback_data=f'delete-{wish_item.id}'),
+            ],
+            [
+                InlineKeyboardButton('« Back to Wish List', callback_data=callback.BACK_TO_WISH_ITEMS_LIST.value),
+            ]
         ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    # Instead of sending a new message, edit the message that
-    # originated the CallbackQuery. This gives the feeling of an
-    # interactive menu.
-    query.edit_message_text(text="Start handler, Choose a route", reply_markup=reply_markup)
-    return FIRST
 
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str(
+            f'Here it is: {wish_item.title}.\n'
+            'What do you want to do with this wish?'
+        )
+        query.edit_message_text(text, reply_markup=reply_markup)
+        return stages.WISH_ITEM_SETTINGS.value
 
-def one(update: Update, context: CallbackContext) -> int:
-    """Show new choice of buttons"""
-    query = update.callback_query
-    query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("3", callback_data=str(THREE)),
-            InlineKeyboardButton("4", callback_data=str(FOUR)),
+    def wish_item_update(self, update, context):
+        query = update.callback_query
+        query.answer()
+
+        wish_item_id = self._get_wish_item_id(query.data)
+        wish_item = WishListItem.objects.get(id=wish_item_id)
+
+        keyboard = [
+            [
+                InlineKeyboardButton('Edit Title', callback_data=f'edit-{wish_item_id}-title'),
+                InlineKeyboardButton('Edit Image', callback_data=f'edit-{wish_item_id}-image')
+            ],
+            [
+                InlineKeyboardButton('Edit Url', callback_data=f'edit-{wish_item_id}-url')
+            ],
+            [
+                InlineKeyboardButton('« Back to Wish', callback_data=self._get_wish_item_pattern(wish_item_id))
+            ],
         ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(
-        text="First CallbackQueryHandler, Choose a route", reply_markup=reply_markup
-    )
-    return FIRST
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str(f'Edit {wish_item.title} info.')
+        query.edit_message_text(text, reply_markup=reply_markup)
+        return stages.WISH_ITEM_UPDATE.value
 
+    def wish_item_delete(self, update, context):
+        query = update.callback_query
+        query.answer()
 
-def two(update: Update, context: CallbackContext) -> int:
-    """Show new choice of buttons"""
-    query = update.callback_query
-    query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("1", callback_data=str(ONE)),
-            InlineKeyboardButton("3", callback_data=str(THREE)),
+        wish_item = WishListItem.objects.get(id=self._get_wish_item_id(query.data))
+        # wish_item.delete() # todo: uncomment
+
+        keyboard = [
+            [InlineKeyboardButton('« Back to Wish List', callback_data=callback.BACK_TO_WISH_ITEMS_LIST.value)],
         ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(
-        text="Second CallbackQueryHandler, Choose a route", reply_markup=reply_markup
-    )
-    return FIRST
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str(f'You have deleted {wish_item.title}.')
+        query.edit_message_text(text, reply_markup=reply_markup)
+        return stages.WISH_ITEM_DELETE.value
+
+    def _get_wish_items_inline_keyboard(self):
+        user = User.objects.get(username='vokler')  # todo: replace on a real user
+        wish_items = WishListItem.objects.filter(user=user)
+        wish_items_inline_keyboard = []
+        for item in wish_items:
+            inline_keyboard = InlineKeyboardButton(item.title, callback_data=self._get_wish_item_pattern(item.id))
+            wish_items_inline_keyboard.append(inline_keyboard)
+        keyboard = [wish_items_inline_keyboard]
+        return keyboard
+
+    def _get_wish_item_id(self, data):
+        wish_item_id = int(data.split('-')[1])
+        return wish_item_id
+
+    def _get_wish_item_pattern(self, wish_item_id):
+        pattern = f'{callback.BACK_TO_WISH_ITEM.value}{wish_item_id}'
+        return pattern
 
 
-def three(update: Update, context: CallbackContext) -> int:
-    """Show new choice of buttons"""
-    query = update.callback_query
-    query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("Yes, let's do it again!", callback_data=str(ONE)),
-            InlineKeyboardButton("Nah, I've had enough ...", callback_data=str(TWO)),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(
-        text="Third CallbackQueryHandler. Do want to start over?", reply_markup=reply_markup
-    )
-    # Transfer to conversation state `SECOND`
-    return SECOND
+cmd = MyWishesCommand()
+wish_item_update = WishItemUpdate()
 
-
-def four(update: Update, context: CallbackContext) -> int:
-    """Show new choice of buttons"""
-    query = update.callback_query
-    query.answer()
-    keyboard = [
-        [
-            InlineKeyboardButton("2", callback_data=str(TWO)),
-            InlineKeyboardButton("3", callback_data=str(THREE)),
-        ]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    query.edit_message_text(
-        text="Fourth CallbackQueryHandler, Choose a route", reply_markup=reply_markup
-    )
-    return FIRST
-
-
-def end(update: Update, context: CallbackContext) -> int:
-    """Returns `ConversationHandler.END`, which tells the
-    ConversationHandler that the conversation is over.
-    """
-    query = update.callback_query
-    query.answer()
-    query.edit_message_text(text="See you next time!")
-    return ConversationHandler.END
-
-
-conv_handler = ConversationHandler(
-    entry_points=[CommandHandler('my_wishes', start)],
+my_wishes_conv_handler = ConversationHandler(
+    entry_points=[CommandHandler('my_wishes', cmd.start)],
     states={
-        FIRST: [
-            CallbackQueryHandler(one, pattern='^' + str(ONE) + '$'),
-            CallbackQueryHandler(two, pattern='^' + str(TWO) + '$'),
-            CallbackQueryHandler(three, pattern='^' + str(THREE) + '$'),
-            CallbackQueryHandler(four, pattern='^' + str(FOUR) + '$'),
+        stages.WISH_ITEMS_LIST.value: [
+            CallbackQueryHandler(cmd.wish_item),
         ],
-        SECOND: [
-            CallbackQueryHandler(start_over, pattern='^' + str(ONE) + '$'),
-            CallbackQueryHandler(end, pattern='^' + str(TWO) + '$'),
+        stages.WISH_ITEM_SETTINGS.value: [
+            CallbackQueryHandler(cmd.wish_item_update, pattern='^edit-[0-9]+$'),
+            CallbackQueryHandler(cmd.wish_item_delete, pattern='^delete-[0-9]+$'),
+            CallbackQueryHandler(cmd.wish_items_list, pattern=callback.BACK_TO_WISH_ITEMS_LIST.value),
         ],
+        stages.WISH_ITEM_DELETE.value: [
+            CallbackQueryHandler(cmd.wish_items_list, pattern=callback.BACK_TO_WISH_ITEMS_LIST.value)
+        ],
+        stages.WISH_ITEM_UPDATE.value: [
+            CallbackQueryHandler(cmd.wish_item, pattern=f'^{callback.BACK_TO_WISH_ITEM.value}[0-9]+$'),
+            CallbackQueryHandler(wish_item_update.start, pattern='^edit-[0-9]+-[a-z]+$')
+        ],
+
+        # WishItemUpdate
+        wish_item_update.UPDATING_FIELD: [
+            MessageHandler(Filters.text, wish_item_update.update),
+            CallbackQueryHandler(cmd.wish_item, pattern=f'^{callback.BACK_TO_WISH_ITEM.value}[0-9]+$'),
+        ]
     },
-    fallbacks=[CommandHandler('start', start)],
+    fallbacks=[CommandHandler('start', start_handler)]
 )
