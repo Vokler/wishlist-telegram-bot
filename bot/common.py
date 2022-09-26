@@ -1,7 +1,5 @@
 from enum import Enum
 
-from django.contrib.auth.models import User
-
 from bot.utils import get_or_create_user
 
 

@@ -9,7 +9,9 @@ from bot.common import WishListBotCommands, AbsHandler
 
 
 class NewWishCommand(AbsHandler):
-    TITLE, IMAGE, URL = range(3)
+    TITLE = 'title'
+    IMAGE = 'image'
+    URL = 'url'
 
     def start(self, update, context):
         """Starts the conversation and asks the user about title of wish."""
