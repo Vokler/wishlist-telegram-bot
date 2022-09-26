@@ -38,6 +38,11 @@ class WishItemUpdate:
         field = context.chat_data['field']
         obj_id = context.chat_data['wish_item_id']
 
+        # updating process
+        obj = WishListItem.objects.get(id=obj_id)
+        setattr(obj, field, new_value)
+        obj.save()
+
         keyboard = [
             [
                 InlineKeyboardButton('« Back to Wish', callback_data=f'{callback.BACK_TO_WISH_ITEM.value}{obj_id}'),
