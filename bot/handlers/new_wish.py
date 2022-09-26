@@ -5,14 +5,15 @@ from telegram.ext import (
     ConversationHandler,
 )
 
-from bot.common import WishListBotCommands
+from bot.common import WishListBotCommands, AbsHandler
 
 
-class NewWishCommand:
+class NewWishCommand(AbsHandler):
     TITLE, IMAGE, URL = range(3)
 
     def start(self, update, context):
         """Starts the conversation and asks the user about title of wish."""
+        super(NewWishCommand, self).start(update, context)
         text = str('Alright, a new wish. What do you want to get? Please send me a name of your wish.')
         update.message.reply_text(text)
         return self.TITLE

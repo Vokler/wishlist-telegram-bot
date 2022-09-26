@@ -1,5 +1,9 @@
 from enum import Enum
 
+from django.contrib.auth.models import User
+
+from bot.utils import get_or_create_user
+
 
 class WishListBotCommands(Enum):
     new_wish = ('/new_wish', 'adding a new wish to your list')
@@ -20,3 +24,12 @@ class MyWishesStages(Enum):
 class MyWishesCallback(Enum):
     BACK_TO_WISH_ITEMS_LIST = 'back-to-wish-items-list'
     BACK_TO_WISH_ITEM = 'get-'
+
+
+class AbsHandler:
+
+    def __init__(self):
+        self.user = None
+
+    def start(self, update, context):
+        self.user = get_or_create_user(update.message.from_user)

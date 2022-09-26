@@ -11,8 +11,7 @@ def start(update, context):
         'You can control me by sending these commands:\n\n'
         f'{WishListBotCommands.get()}'
     )
-    user = get_or_create_user(update.message.from_user)
-    context.user_data['user'] = user
+    get_or_create_user(update.message.from_user)
     context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=PARSEMODE_HTML)
 
 
