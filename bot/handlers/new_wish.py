@@ -6,6 +6,7 @@ from telegram.ext import (
 )
 
 from bot.common import WishListBotCommands, AbsHandler
+from bot.models import WishListItem
 
 
 class NewWishCommand(AbsHandler):
@@ -23,7 +24,7 @@ class NewWishCommand(AbsHandler):
     def title(self, update, context):
         """Stores the title and asks for an image."""
         title = update.message.text
-        print(title)
+        context.chat_data['title'] = title
 
         text = str('Good. Now, send me an image of your wish please, or send /skip if you don\'t want to.')
         update.message.reply_text(text)
@@ -32,7 +33,7 @@ class NewWishCommand(AbsHandler):
     def image(self, update, context):
         """Stores the image and asks for an url."""
         image = update.message.photo[-1].get_file()
-        print(image)
+        context.chat_data['image'] = image
 
         text = str('Super. Now, send me an url of your wish if you have it, or send /skip.')
         update.message.reply_text(text)
@@ -49,7 +50,9 @@ class NewWishCommand(AbsHandler):
     def url(self, update, context):
         """Stores the url and ends the conversation."""
         url = update.message.text
-        print(url)
+        context.chat_data['url'] = url
+
+        self._create_wish_item(context.chat_data)
 
         text = str('Thank you!')
         update.message.reply_text(text)
@@ -59,6 +62,8 @@ class NewWishCommand(AbsHandler):
         """Skips the url and ends the conversation."""
         print('User did not send an url.')
 
+        self._create_wish_item(context.chat_data)
+
         text = str('OK. Thank you!')
         update.message.reply_text(text)
         return ConversationHandler.END
@@ -66,6 +71,11 @@ class NewWishCommand(AbsHandler):
     def cancel(self, update, context):
         """Cancels and ends the conversation."""
         return ConversationHandler.END
+
+    def _create_wish_item(self, data):
+        data['user'] = self.user
+        wish_item = WishListItem.objects.create(**data)
+        return wish_item
 
 
 new_wish_cmd = NewWishCommand()
