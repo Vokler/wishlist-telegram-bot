@@ -10,3 +10,8 @@ class WishListItem(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class UserFollow(models.Model):
+    following = models.ForeignKey(to=User, related_name='who_follows', on_delete=models.CASCADE)
+    follower = models.ForeignKey(to=User, related_name='who_is_followed', on_delete=models.CASCADE)

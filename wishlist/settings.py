@@ -28,7 +28,7 @@ ALLOWED_HOSTS = ['*']
 
 # Server settings
 
-SERVER_DOMAIN = 'https://f2b9-2a02-14f-1fb-f02b-c8dd-f52d-a1a4-d3b7.eu.ngrok.io'
+SERVER_DOMAIN = 'https://91b1-2a02-14f-1fb-f02b-1c58-2db1-af28-a482.eu.ngrok.io'
 
 # Application definition
 
@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django_extensions',
 
     'bot',
 ]
