@@ -6,6 +6,7 @@ from bot.utils import get_or_create_user
 class WishListBotCommands(Enum):
     new_wish = ('/new_wish', 'adding a new wish to your list')
     my_wishes = ('/my_wishes', 'edit your wishes')
+    follow = ('/follow', 'subscribe to the user\'s wishes')
 
     @classmethod
     def get(cls):
