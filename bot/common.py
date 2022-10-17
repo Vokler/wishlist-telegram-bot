@@ -7,6 +7,7 @@ class WishListBotCommands(Enum):
     new_wish = ('/new_wish', 'adding a new wish to your list')
     my_wishes = ('/my_wishes', 'edit your wishes')
     follow = ('/follow', 'subscribe to the user\'s wishes')
+    subscriptions = ('/subscriptions', 'your subscriptions to users')
 
     @classmethod
     def get(cls):

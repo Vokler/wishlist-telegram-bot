@@ -12,7 +12,8 @@ from bot.apps import BotConfig
 from bot.handlers.start import start_handler
 from bot.handlers.new_wish import new_wish_conv_handler
 from bot.handlers.my_wishes import my_wishes_conv_handler
-from bot.handlers.follow import follow_handler
+from bot.handlers.follow import follow_conv_handler
+from bot.handlers.subscriptions import subs_conv_handler
 
 
 @csrf_exempt
@@ -25,7 +26,8 @@ def process(request):
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(new_wish_conv_handler)
     dispatcher.add_handler(my_wishes_conv_handler)
-    dispatcher.add_handler(follow_handler)
+    dispatcher.add_handler(follow_conv_handler)
+    dispatcher.add_handler(subs_conv_handler)
 
     # Start the thread
     thread = Thread(target=dispatcher.start, name='dispatcher')

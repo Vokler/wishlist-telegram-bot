@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 
 from bot.models import WishListItem
 from bot.handlers.start import start_handler
-from bot.common import MyWishesStages, MyWishesCallback
+from bot.common import MyWishesStages, MyWishesCallback, WishListBotCommands
 
 stages = MyWishesStages
 callback = MyWishesCallback
@@ -174,7 +174,7 @@ cmd = MyWishesCommand()
 wish_item_update = WishItemUpdate()
 
 my_wishes_conv_handler = ConversationHandler(
-    entry_points=[CommandHandler('my_wishes', cmd.start)],
+    entry_points=[CommandHandler(WishListBotCommands.my_wishes.name, cmd.start)],
     states={
         stages.WISH_ITEMS_LIST.value: [
             CallbackQueryHandler(cmd.wish_item),

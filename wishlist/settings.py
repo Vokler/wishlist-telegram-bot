@@ -28,7 +28,7 @@ ALLOWED_HOSTS = ['*']
 
 # Server settings
 
-SERVER_DOMAIN = 'https://91b1-2a02-14f-1fb-f02b-1c58-2db1-af28-a482.eu.ngrok.io'
+SERVER_DOMAIN = 'https://db75-2a03-c5c0-107c-2e1c-cb3-f36-6d71-e7f1.eu.ngrok.io'
 
 # Application definition
 
