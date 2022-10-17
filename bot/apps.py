@@ -1,10 +1,8 @@
-import telegram
-
 from queue import Queue
 
+import telegram
 from django.apps import AppConfig
 from django.conf import settings
-
 from telegram.ext import Dispatcher
 
 

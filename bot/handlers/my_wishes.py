@@ -1,18 +1,12 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import (
-    CommandHandler,
-    CallbackQueryHandler,
-    ConversationHandler,
-    MessageHandler,
-    Filters,
-)
-from telegram.constants import PARSEMODE_HTML
-
 from django.contrib.auth.models import User
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.constants import PARSEMODE_HTML
+from telegram.ext import (CallbackQueryHandler, CommandHandler,
+                          ConversationHandler, Filters, MessageHandler)
 
-from bot.models import WishListItem
+from bot.common import MyWishesCallback, MyWishesStages, WishListBotCommands
 from bot.handlers.start import start_handler
-from bot.common import MyWishesStages, MyWishesCallback, WishListBotCommands
+from bot.models import WishListItem
 
 stages = MyWishesStages
 callback = MyWishesCallback

@@ -1,8 +1,8 @@
-from telegram.ext import CommandHandler
 from telegram.constants import PARSEMODE_HTML
+from telegram.ext import CommandHandler
 
-from bot.utils import get_or_create_user
 from bot.common import WishListBotCommands
+from bot.utils import get_or_create_user
 
 
 def start(update, context):

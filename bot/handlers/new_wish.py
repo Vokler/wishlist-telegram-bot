@@ -1,11 +1,7 @@
-from telegram.ext import (
-    CommandHandler,
-    MessageHandler,
-    Filters,
-    ConversationHandler,
-)
+from telegram.ext import (CommandHandler, ConversationHandler, Filters,
+                          MessageHandler)
 
-from bot.common import WishListBotCommands, AbsHandler
+from bot.common import AbsHandler, WishListBotCommands
 from bot.models import WishListItem
 
 
