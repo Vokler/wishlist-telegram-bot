@@ -1,17 +1,36 @@
 from enum import Enum
 
+import telegram
+
 from bot.utils import get_or_create_user
 
 
 class WishListBotCommands(Enum):
-    new_wish = ('/new_wish', 'adding a new wish to your list')
-    my_wishes = ('/my_wishes', 'edit your wishes')
-    follow = ('/follow', 'subscribe to the user\'s wishes')
-    subscriptions = ('/subscriptions', 'your subscriptions to users')
+    new_wish = ('new_wish', 'adding a new wish to your list')
+    my_wishes = ('my_wishes', 'edit your wishes')
+    follow = ('follow', 'subscribe to the user\'s wishes')
+    subscriptions = ('subscriptions', 'your subscriptions to users')
 
     @classmethod
-    def get(cls):
-        return '\n'.join(f'{command.value[0]} - {command.value[1]}' for command in cls)
+    def get_wishes_commands(cls):
+        cmds = str(
+            f'/{cls.new_wish.value[0]} - {cls.new_wish.value[1]}\n'
+            f'/{cls.my_wishes.value[0]} - {cls.my_wishes.value[1]}\n'
+        )
+        return cmds
+
+    @classmethod
+    def get_users_commands(cls):
+        cmds = str(
+            f'/{cls.follow.value[0]} - {cls.follow.value[1]}\n'
+            f'/{cls.subscriptions.value[0]} - {cls.subscriptions.value[1]}\n'
+        )
+        return cmds
+
+    @classmethod
+    def create_bot_commands(cls):
+        commands = [telegram.BotCommand(command=cmd.value[0], description=cmd.value[1]) for cmd in cls]
+        return commands
 
 
 class MyWishesStages(Enum):
