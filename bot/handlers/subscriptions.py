@@ -19,21 +19,36 @@ class SubscriptionsCommand(AbsHandler):
 
     def start(self, update, context):
         super(SubscriptionsCommand, self).start(update, context)
-        keyboard = self._get_subscriptions()
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        text = str('These are the users you are subscribed to:')
-        update.message.reply_text(text, reply_markup=reply_markup)
+        subscriptions_inline = self._get_subscriptions()
+        if subscriptions_inline:
+            keyboard = [subscriptions_inline]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            text = str('These are the users you are subscribed to:')
+            update.message.reply_text(text, reply_markup=reply_markup)
+        else:
+            text = str(
+                'You are not subscribed to anyone.\n\n'
+                f'/{WishListBotCommands.follow.value[0]} - {WishListBotCommands.follow.value[1]}'
+            )
+            update.message.reply_text(text)
         return self.SUBSCRIPTIONS
 
     def subscriptions(self, update, context):
         query = update.callback_query
         query.answer()
 
-        keyboard = self._get_subscriptions()
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        text = str('These are the users you are subscribed to:')
-
-        query.edit_message_text(text, reply_markup=reply_markup)
+        subscriptions_inline = self._get_subscriptions()
+        if subscriptions_inline:
+            keyboard = [subscriptions_inline]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            text = str('These are the users you are subscribed to:')
+            query.edit_message_text(text, reply_markup=reply_markup)
+        else:
+            text = str(
+                'You are not subscribed to anyone.\n\n'
+                f'/{WishListBotCommands.follow.value[0]} - {WishListBotCommands.follow.value[1]}'
+            )
+            query.edit_message_text(text)
         return self.SUBSCRIPTIONS
 
     def subscription(self, update, context):
@@ -115,8 +130,8 @@ class SubscriptionsCommand(AbsHandler):
         for subscription in subscriptions:
             inline_keyboard = InlineKeyboardButton(f'@{subscription.following.username}', callback_data=subscription.id)
             subscriptions_inline_keyboard.append(inline_keyboard)
-        keyboard = [subscriptions_inline_keyboard]
-        return keyboard
+        subscriptions_inline = subscriptions_inline_keyboard
+        return subscriptions_inline
 
     def _get_subscription_id(self, data):
         subscription_id = int(data.split('-')[-1])
