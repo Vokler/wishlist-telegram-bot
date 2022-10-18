@@ -74,11 +74,7 @@ class NewWishCommand(AbsHandler):
 
     def _create_wish_item(self, data):
         wish_item = WishListItem.objects.create(title=data.get('title'), url=data.get('url'), user=self.user)
-
-        img_url = data.get('image_url')
-        if img_url:
-            result = urllib.request.urlretrieve(img_url)
-            wish_item.image.save(os.path.basename(img_url), File(open(result[0], 'rb')))
+        wish_item.upload_image_by_url(data.get('image_url'))
         return wish_item
 
 

@@ -1,3 +1,7 @@
+import os
+import urllib
+
+from django.core.files import File
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -10,6 +14,13 @@ class WishListItem(models.Model):
 
     def __str__(self):
         return self.title
+
+    def upload_image_by_url(self, url):
+        try:
+            result = urllib.request.urlretrieve(url)
+            self.image.save(os.path.basename(url), File(open(result[0], 'rb')))
+        except Exception as e:
+            raise e
 
 
 class UserFollow(models.Model):
