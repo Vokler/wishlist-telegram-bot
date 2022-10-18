@@ -29,14 +29,19 @@ class WishItemUpdate:
         return self.UPDATING_FIELD
 
     def update(self, update, context):
-        new_value = update.message.text
         field = context.chat_data['field']
         obj_id = context.chat_data['wish_item_id']
+        obj = WishListItem.objects.get(id=obj_id)
 
         # updating process
-        obj = WishListItem.objects.get(id=obj_id)
-        setattr(obj, field, new_value)
-        obj.save()
+        if field == 'image':
+            image = update.message.photo[-1].get_file()
+            image_url = image['file_path']
+            obj.upload_image_by_url(image_url)
+        else:
+            new_value = update.message.text
+            setattr(obj, field, new_value)
+            obj.save()
 
         keyboard = [
             [
@@ -188,7 +193,7 @@ my_wishes_conv_handler = ConversationHandler(
 
         # WishItemUpdate
         wish_item_update.UPDATING_FIELD: [
-            MessageHandler(Filters.text, wish_item_update.update),
+            MessageHandler(Filters.text | Filters.photo, wish_item_update.update),
             CallbackQueryHandler(cmd.wish_item, pattern=f'^{callback.BACK_TO_WISH_ITEM.value}[0-9]+$'),
         ]
     },
