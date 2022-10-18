@@ -129,8 +129,8 @@ class MyWishesCommand:
         text = str(
             f'Edit {wish_item.title} info.\n\n'
             f'<b>Title</b>: {wish_item.title}\n'
-            f'<b>Image</b>: None\n'
-            f'<b>Url</b>: {wish_item.url if wish_item.url else None}\n'
+            f'<b>Image</b>: {"🖼" if wish_item.image else "🚫"}\n'
+            f'<b>Url</b>: {wish_item.url if wish_item.url else "🚫"}\n'
         )
         query.edit_message_text(text, reply_markup=reply_markup, parse_mode=PARSEMODE_HTML)
         return stages.WISH_ITEM_UPDATE.value
