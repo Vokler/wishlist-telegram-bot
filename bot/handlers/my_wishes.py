@@ -67,17 +67,26 @@ class WishItemUpdate:
 class MyWishesCommand(AbsHandler):
     def start(self, update, context):
         super(MyWishesCommand, self).start(update, context)
-        keyboard = self._get_wish_items_inline_keyboard()
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        text = str('Choose a wish from the list below:')
-        update.message.reply_text(text, reply_markup=reply_markup)
+        wish_items_inline = self._get_wish_items_inline_keyboard()
+        if wish_items_inline:
+            keyboard = [wish_items_inline]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            text = str('Choose a wish from the list below:')
+            update.message.reply_text(text, reply_markup=reply_markup)
+        else:
+            text = str(
+                'You haven\'t added any wishes yet.\n\n'
+                f'/{WishListBotCommands.new_wish.value[0]} - {WishListBotCommands.new_wish.value[1]}'
+            )
+            update.message.reply_text(text)
         return stages.WISH_ITEMS_LIST.value
 
     def wish_items_list(self, update, context):
         query = update.callback_query
         query.answer()
 
-        keyboard = self._get_wish_items_inline_keyboard()
+        wish_items_inline = self._get_wish_items_inline_keyboard()
+        keyboard = [wish_items_inline]
         reply_markup = InlineKeyboardMarkup(keyboard)
         text = str('Choose a wish from the list below:')
         query.edit_message_text(text, reply_markup=reply_markup)
@@ -157,8 +166,8 @@ class MyWishesCommand(AbsHandler):
         for item in wish_items:
             inline_keyboard = InlineKeyboardButton(item.title, callback_data=self._get_wish_item_pattern(item.id))
             wish_items_inline_keyboard.append(inline_keyboard)
-        keyboard = [wish_items_inline_keyboard]
-        return keyboard
+        wish_items_inline = wish_items_inline_keyboard
+        return wish_items_inline
 
     def _get_wish_item_id(self, data):
         wish_item_id = int(data.split('-')[1])

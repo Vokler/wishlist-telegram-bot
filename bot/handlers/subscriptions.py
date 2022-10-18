@@ -38,17 +38,10 @@ class SubscriptionsCommand(AbsHandler):
         query.answer()
 
         subscriptions_inline = self._get_subscriptions()
-        if subscriptions_inline:
-            keyboard = [subscriptions_inline]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            text = str('These are the users you are subscribed to:')
-            query.edit_message_text(text, reply_markup=reply_markup)
-        else:
-            text = str(
-                'You are not subscribed to anyone.\n\n'
-                f'/{WishListBotCommands.follow.value[0]} - {WishListBotCommands.follow.value[1]}'
-            )
-            query.edit_message_text(text)
+        keyboard = [subscriptions_inline]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str('These are the users you are subscribed to:')
+        query.edit_message_text(text, reply_markup=reply_markup)
         return self.SUBSCRIPTIONS
 
     def subscription(self, update, context):
