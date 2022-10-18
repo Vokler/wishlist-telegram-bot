@@ -1,7 +1,3 @@
-import os
-import urllib
-
-from django.core.files import File
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler)
 
