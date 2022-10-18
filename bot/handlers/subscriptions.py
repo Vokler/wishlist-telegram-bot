@@ -10,7 +10,11 @@ from bot.models import UserFollow
 
 class SubscriptionsCommand(AbsHandler):
     SUBSCRIPTIONS = 'subscriptions'
-    SUBSCRIPTION_SETTINGS = 'subscriptions-settings'
+    SUBSCRIPTION = 'subscription'
+    SUBSCRIPTION_WISHES = 'subscriptions-wishes'
+
+    BACK_TO_SUBSCRIPTION = 'back-to-subscription-'
+    BACK_TO_SUBSCRIPTIONS = 'back-to-subscriptions'
 
     def start(self, update, context):
         super(SubscriptionsCommand, self).start(update, context)
@@ -20,11 +24,22 @@ class SubscriptionsCommand(AbsHandler):
         update.message.reply_text(text, reply_markup=reply_markup)
         return self.SUBSCRIPTIONS
 
+    def subscriptions(self, update, context):
+        query = update.callback_query
+        query.answer()
+
+        keyboard = self._get_subscriptions()
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str('These are the users you are subscribed to:')
+
+        query.edit_message_text(text, reply_markup=reply_markup)
+        return self.SUBSCRIPTIONS
+
     def subscription(self, update, context):
         query = update.callback_query
         query.answer()
 
-        subscription_id = query.data
+        subscription_id = self._get_subscription_id(query.data)
         subscription = UserFollow.objects.get(id=subscription_id)
 
         keyboard = [
@@ -33,7 +48,7 @@ class SubscriptionsCommand(AbsHandler):
                 InlineKeyboardButton('Remove', callback_data=f'delete-{subscription_id}'),
             ],
             [
-                InlineKeyboardButton('« Back to subscriptions', callback_data='prob'),
+                InlineKeyboardButton('« Back to subscriptions', callback_data=self.BACK_TO_SUBSCRIPTIONS),
             ]
         ]
 
@@ -43,7 +58,7 @@ class SubscriptionsCommand(AbsHandler):
             'What do you want to do with this subscription?'
         )
         query.edit_message_text(text, reply_markup=reply_markup)
-        return self.SUBSCRIPTION_SETTINGS
+        return self.SUBSCRIPTION
 
     def subscription_wishes(self, update, context):
         query = update.callback_query
@@ -53,21 +68,27 @@ class SubscriptionsCommand(AbsHandler):
         subscription = UserFollow.objects.get(id=subscription_id)
         wish_items = subscription.following.wishlistitem_set.all()
 
-        keyboard = [[InlineKeyboardButton('« Back to subscription', callback_data='prob')]]
+        keyboard = [[
+            InlineKeyboardButton('« Back to subscription',
+                                 callback_data=self._get_subscription_pattern(subscription_id))
+        ]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         if wish_items.exists():
+            text = ''
             for item in wish_items:
-                text = str(
-                    f'<b>{item.title}</b>\n'
-                    f'{item.url}\n'
-                    f'{item.image.url if item.image else None}\n\n'
+                wish_item_info = str(
+                    f'<b>Title</b>: {item.title}\n'
+                    f'<b>Image</b>: {"🖼" if item.image else "🚫"}\n'
+                    f'<b>Url</b>: {item.url if item.url else "🚫"}\n\n'
                 )
+                text += wish_item_info
                 query.edit_message_text(text, reply_markup=reply_markup, parse_mode=PARSEMODE_HTML)
         else:
-            text = 'Empty'
+            text = str(f'@{subscription.following.username} has not added any wishes yet.')
+            query.edit_message_text(text, reply_markup=reply_markup, parse_mode=PARSEMODE_HTML)
 
-        return self.SUBSCRIPTION_SETTINGS
+        return self.SUBSCRIPTION_WISHES
 
     def _get_subscriptions(self):
         subscriptions = self.user.who_is_followed.all()
@@ -79,12 +100,12 @@ class SubscriptionsCommand(AbsHandler):
         return keyboard
 
     def _get_subscription_id(self, data):
-        subscription_id = int(data.split('-')[1])
+        subscription_id = int(data.split('-')[-1])
         return subscription_id
 
-    # def _get_wish_item_pattern(self, wish_item_id):
-    #     pattern = f'{callback.BACK_TO_WISH_ITEM.value}{wish_item_id}'
-    #     return pattern
+    def _get_subscription_pattern(self, subscription_id):
+        pattern = f'{self.BACK_TO_SUBSCRIPTION}{subscription_id}'
+        return pattern
 
 
 subs_cmd = SubscriptionsCommand()
@@ -94,8 +115,12 @@ subs_conv_handler = ConversationHandler(
         subs_cmd.SUBSCRIPTIONS: [
             CallbackQueryHandler(subs_cmd.subscription),
         ],
-        subs_cmd.SUBSCRIPTION_SETTINGS: [
+        subs_cmd.SUBSCRIPTION: [
             CallbackQueryHandler(subs_cmd.subscription_wishes, pattern='^wishes-[0-9]+$'),
+            CallbackQueryHandler(subs_cmd.subscriptions, pattern=subs_cmd.BACK_TO_SUBSCRIPTIONS)
+        ],
+        subs_cmd.SUBSCRIPTION_WISHES: [
+            CallbackQueryHandler(subs_cmd.subscription, pattern=f'^{subs_cmd.BACK_TO_SUBSCRIPTION}[0-9]+$')
         ]
     },
     fallbacks=[CommandHandler('start', start_handler)]
