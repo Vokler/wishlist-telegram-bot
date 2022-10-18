@@ -1,10 +1,10 @@
-from django.contrib.auth.models import User
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import PARSEMODE_HTML
 from telegram.ext import (CallbackQueryHandler, CommandHandler,
                           ConversationHandler, Filters, MessageHandler)
 
-from bot.common import MyWishesCallback, MyWishesStages, WishListBotCommands
+from bot.common import (AbsHandler, MyWishesCallback, MyWishesStages,
+                        WishListBotCommands)
 from bot.handlers.start import start_handler
 from bot.models import WishListItem
 
@@ -64,8 +64,9 @@ class WishItemUpdate:
         return id
 
 
-class MyWishesCommand:
+class MyWishesCommand(AbsHandler):
     def start(self, update, context):
+        super(MyWishesCommand, self).start(update, context)
         keyboard = self._get_wish_items_inline_keyboard()
         reply_markup = InlineKeyboardMarkup(keyboard)
         text = str('Choose a wish from the list below:')
@@ -151,8 +152,7 @@ class MyWishesCommand:
         return stages.WISH_ITEM_DELETE.value
 
     def _get_wish_items_inline_keyboard(self):
-        user = User.objects.get(username='vokler')  # todo: replace on a real user
-        wish_items = WishListItem.objects.filter(user=user)
+        wish_items = WishListItem.objects.filter(user=self.user)
         wish_items_inline_keyboard = []
         for item in wish_items:
             inline_keyboard = InlineKeyboardButton(item.title, callback_data=self._get_wish_item_pattern(item.id))
