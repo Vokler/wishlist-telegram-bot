@@ -1,13 +1,11 @@
-from django.contrib.auth.models import User
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import PARSEMODE_HTML
 from telegram.ext import (CallbackQueryHandler, CommandHandler,
-                          ConversationHandler, Filters, MessageHandler)
+                          ConversationHandler)
 
-from bot.common import (AbsHandler, MyWishesCallback, MyWishesStages,
-                        WishListBotCommands)
+from bot.common import AbsHandler, WishListBotCommands
 from bot.handlers.start import start_handler
-from bot.models import UserFollow, WishListItem
+from bot.models import UserFollow
 
 
 class SubscriptionsCommand(AbsHandler):
@@ -55,7 +53,7 @@ class SubscriptionsCommand(AbsHandler):
         subscription = UserFollow.objects.get(id=subscription_id)
         wish_items = subscription.following.wishlistitem_set.all()
 
-        keyboard = [[InlineKeyboardButton('« Back to subscription', callback_data=f'prob')]]
+        keyboard = [[InlineKeyboardButton('« Back to subscription', callback_data='prob')]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         if wish_items.exists():

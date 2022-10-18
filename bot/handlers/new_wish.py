@@ -1,3 +1,7 @@
+import os
+import urllib
+
+from django.core.files import File
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler)
 
@@ -29,7 +33,7 @@ class NewWishCommand(AbsHandler):
     def image(self, update, context):
         """Stores the image and asks for an url."""
         image = update.message.photo[-1].get_file()
-        context.chat_data['image'] = image
+        context.chat_data['image_url'] = image['file_path']
 
         text = str('Super. Now, send me an url of your wish if you have it, or send /skip.')
         update.message.reply_text(text)
@@ -69,8 +73,12 @@ class NewWishCommand(AbsHandler):
         return ConversationHandler.END
 
     def _create_wish_item(self, data):
-        data['user'] = self.user
-        wish_item = WishListItem.objects.create(**data)
+        wish_item = WishListItem.objects.create(title=data.get('title'), url=data.get('url'), user=self.user)
+
+        img_url = data.get('image_url')
+        if img_url:
+            result = urllib.request.urlretrieve(img_url)
+            wish_item.image.save(os.path.basename(img_url), File(open(result[0], 'rb')))
         return wish_item
 
 

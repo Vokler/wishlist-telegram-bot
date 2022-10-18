@@ -28,7 +28,7 @@ ALLOWED_HOSTS = ['*']
 
 # Server settings
 
-SERVER_DOMAIN = 'https://db75-2a03-c5c0-107c-2e1c-cb3-f36-6d71-e7f1.eu.ngrok.io'
+SERVER_DOMAIN = 'https://4729-2a03-c5c0-107c-2e1c-f977-4edf-d07c-9561.eu.ngrok.io'
 
 # Application definition
 
@@ -118,6 +118,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
