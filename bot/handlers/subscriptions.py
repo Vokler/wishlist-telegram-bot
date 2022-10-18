@@ -12,6 +12,7 @@ class SubscriptionsCommand(AbsHandler):
     SUBSCRIPTIONS = 'subscriptions'
     SUBSCRIPTION = 'subscription'
     SUBSCRIPTION_WISHES = 'subscriptions-wishes'
+    UNSUBSCRIBE = 'unsubscribe'
 
     BACK_TO_SUBSCRIPTION = 'back-to-subscription-'
     BACK_TO_SUBSCRIPTIONS = 'back-to-subscriptions'
@@ -45,7 +46,7 @@ class SubscriptionsCommand(AbsHandler):
         keyboard = [
             [
                 InlineKeyboardButton('Wishes', callback_data=f'wishes-{subscription_id}'),
-                InlineKeyboardButton('Remove', callback_data=f'delete-{subscription_id}'),
+                InlineKeyboardButton('Unsubscribe', callback_data=f'delete-{subscription_id}'),
             ],
             [
                 InlineKeyboardButton('« Back to subscriptions', callback_data=self.BACK_TO_SUBSCRIPTIONS),
@@ -90,6 +91,24 @@ class SubscriptionsCommand(AbsHandler):
 
         return self.SUBSCRIPTION_WISHES
 
+    def subscription_remove(self, update, context):
+        query = update.callback_query
+        query.answer()
+
+        subscription_id = self._get_subscription_id(query.data)
+        subscription = UserFollow.objects.get(id=subscription_id)
+        subscription.delete()
+
+        keyboard = [
+            [InlineKeyboardButton('« Back to subscriptions', callback_data=self.BACK_TO_SUBSCRIPTIONS)],
+        ]
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        text = str(f'You have unsubscribed from @{subscription.following.username}.')
+        query.edit_message_text(text, reply_markup=reply_markup)
+
+        return self.UNSUBSCRIBE
+
     def _get_subscriptions(self):
         subscriptions = self.user.who_is_followed.all()
         subscriptions_inline_keyboard = []
@@ -117,10 +136,14 @@ subs_conv_handler = ConversationHandler(
         ],
         subs_cmd.SUBSCRIPTION: [
             CallbackQueryHandler(subs_cmd.subscription_wishes, pattern='^wishes-[0-9]+$'),
-            CallbackQueryHandler(subs_cmd.subscriptions, pattern=subs_cmd.BACK_TO_SUBSCRIPTIONS)
+            CallbackQueryHandler(subs_cmd.subscription_remove, pattern='^delete-[0-9]+$'),
+            CallbackQueryHandler(subs_cmd.subscriptions, pattern=subs_cmd.BACK_TO_SUBSCRIPTIONS),
         ],
         subs_cmd.SUBSCRIPTION_WISHES: [
-            CallbackQueryHandler(subs_cmd.subscription, pattern=f'^{subs_cmd.BACK_TO_SUBSCRIPTION}[0-9]+$')
+            CallbackQueryHandler(subs_cmd.subscription, pattern=f'^{subs_cmd.BACK_TO_SUBSCRIPTION}[0-9]+$'),
+        ],
+        subs_cmd.UNSUBSCRIBE: [
+            CallbackQueryHandler(subs_cmd.subscriptions, pattern=subs_cmd.BACK_TO_SUBSCRIPTIONS),
         ]
     },
     fallbacks=[CommandHandler('start', start_handler)]
