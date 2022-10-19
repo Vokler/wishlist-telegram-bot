@@ -1,11 +1,10 @@
 from django.conf import settings
-from django.contrib.auth.models import User
 from telegram.constants import PARSEMODE_HTML
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler)
 
 from bot.common import AbsHandler, WishListBotCommands
-from bot.models import UserFollow
+from bot.models import User, UserFollow
 
 
 class FollowCommand(AbsHandler):

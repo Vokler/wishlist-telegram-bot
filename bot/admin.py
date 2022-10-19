@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 
-from bot.models import UserFollow, WishListItem
+from bot.models import User, UserFollow, WishListItem
 
 
 class WishListItemAdmin(admin.TabularInline):
