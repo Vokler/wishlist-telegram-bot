@@ -70,7 +70,9 @@ class NewWishCommand(AbsHandler):
 
     def _create_wish_item(self, data):
         wish_item = WishListItem.objects.create(title=data.get('title'), url=data.get('url'), user=self.user)
-        wish_item.upload_image_by_url(data.get('image_url'))
+        image_url = data.get('image_url')
+        if image_url:
+            wish_item.upload_image_by_url(image_url)
         return wish_item
 
 

@@ -1,9 +1,12 @@
+import logging
 import os
 import urllib
 
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.db import models
+
+logger = logging.getLogger(__name__)
 
 
 class WishListItem(models.Model):
@@ -16,11 +19,8 @@ class WishListItem(models.Model):
         return self.title
 
     def upload_image_by_url(self, url):
-        try:
-            result = urllib.request.urlretrieve(url)
-            self.image.save(os.path.basename(url), File(open(result[0], 'rb')))
-        except Exception as e:
-            raise e
+        result = urllib.request.urlretrieve(url)
+        self.image.save(os.path.basename(url), File(open(result[0], 'rb')))
 
 
 class UserFollow(models.Model):
