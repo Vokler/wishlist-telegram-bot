@@ -25,6 +25,7 @@ env = environ.Env(
     DATABASE_PORT=(str),
 
     BOT_TOKEN=(str),
+    BOT_LINK=(str),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -198,3 +199,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Telegram Bot settings
 
 BOT_TOKEN = env('BOT_TOKEN')
+BOT_LINK = env('BOT_LINK')
+
+# User
+
+AUTH_USER_MODEL = 'bot.User'

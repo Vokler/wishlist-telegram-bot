@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
 from bot.models import UserFollow, WishListItem
@@ -29,9 +28,6 @@ class WhoIsFollowedAdmin(admin.TabularInline):
     extra = 0
 
 
-class UserAdmin(BaseUserAdmin):
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
     inlines = (WishListItemAdmin, WhoFollowAdmin, WhoIsFollowedAdmin)
-
-
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from telegram.constants import PARSEMODE_HTML
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
@@ -33,9 +34,9 @@ class FollowCommand(AbsHandler):
             else:
                 text = str(f'You\'ve already subscribed to {tg_username}.')
         except User.DoesNotExist:
-            # todo: send invitation to join the bot
             text = str(
-                f'{tg_username} does not use <b>WishListBot</b> bot.\n'
+                f'{tg_username} does not use <b>WishListBot</b> bot.\n\n'
+                f'Share the link: {settings.BOT_LINK}'
             )
         update.message.reply_text(text, parse_mode=PARSEMODE_HTML)
         return ConversationHandler.END

@@ -2,11 +2,15 @@ import logging
 import os
 import urllib
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.core.files import File
 from django.db import models
 
 logger = logging.getLogger(__name__)
+
+
+class User(AbstractUser):
+    tg_chat_id = models.IntegerField(blank=True, null=True)
 
 
 class WishListItem(models.Model):
