@@ -30,3 +30,4 @@ class WhoIsFollowedAdmin(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     inlines = (WishListItemAdmin, WhoFollowAdmin, WhoIsFollowedAdmin)
+    readonly_fields = ('tg_chat_id',)

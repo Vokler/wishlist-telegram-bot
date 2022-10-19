@@ -15,7 +15,7 @@ def start(update, context):
         f'{WishListBotCommands.get_users_commands()}'
 
     )
-    get_or_create_user(update.message.from_user)
+    get_or_create_user(update.message.chat)
     context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode=PARSEMODE_HTML)
 
 
