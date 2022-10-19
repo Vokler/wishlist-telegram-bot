@@ -29,7 +29,8 @@ class FollowCommand(AbsHandler):
             subscription, created = UserFollow.objects.get_or_create(follower=self.user, following=following)
             if created:
                 text = str(f'Done. You\'ve subscribed to {tg_username}.')
-                # todo: send notification to tg_username about new follower
+                text_to_following = str(f'@{self.user.username} subscribed to you.')
+                context.bot.send_message(chat_id=following.tg_chat_id, text=text_to_following)
             else:
                 text = str(f'You\'ve already subscribed to {tg_username}.')
         except User.DoesNotExist:
