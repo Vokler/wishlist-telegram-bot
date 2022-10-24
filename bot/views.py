@@ -1,4 +1,5 @@
 import json
+import logging
 from threading import Thread
 
 from django.conf import settings
@@ -12,6 +13,8 @@ from bot.handlers.my_wishes import my_wishes_conv_handler
 from bot.handlers.new_wish import new_wish_conv_handler
 from bot.handlers.start import start_handler
 from bot.handlers.subscriptions import subs_conv_handler
+
+logger = logging.getLogger(__name__)
 
 UPDATE_QUEUE = BotConfig.update_queue
 DISPATCHER = BotConfig.dispatcher
@@ -31,6 +34,10 @@ def process(request):
     DISPATCHER.add_handler(follow_conv_handler)
     DISPATCHER.add_handler(subs_conv_handler)
 
+    try:
+        logger.warning(f'HERE is BODY: {json.loads(request.body.decode())}')
+    except Exception as e:
+        logger.warning(f'ERROR: {e}')
     UPDATE_QUEUE.put(Update.de_json(json.loads(request.body.decode()), bot))
 
     return JsonResponse({})

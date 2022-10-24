@@ -1,12 +1,9 @@
-import logging
 import os
 import urllib
 
 from django.contrib.auth.models import AbstractUser
 from django.core.files import File
 from django.db import models
-
-logger = logging.getLogger(__name__)
 
 
 class User(AbstractUser):
