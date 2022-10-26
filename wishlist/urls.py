@@ -22,7 +22,7 @@ from bot.views import process
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', process, name='process'),
+    path('process/', process, name='process'),
 ]
 
 if settings.DEBUG:
