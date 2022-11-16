@@ -48,6 +48,7 @@ class FollowCommand(AbsHandler):
 
 follow_cmd = FollowCommand()
 follow_conv_handler = ConversationHandler(
+    allow_reentry=True,
     entry_points=[CommandHandler(WishListBotCommands.follow.name, follow_cmd.start)],
     states={
         follow_cmd.SUBSCRIPTION: [MessageHandler(Filters.text, follow_cmd.create_subscription)],

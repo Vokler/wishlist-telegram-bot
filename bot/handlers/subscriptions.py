@@ -137,6 +137,7 @@ class SubscriptionsCommand(AbsHandler):
 
 subs_cmd = SubscriptionsCommand()
 subs_conv_handler = ConversationHandler(
+    allow_reentry=True,
     entry_points=[CommandHandler(WishListBotCommands.subscriptions.name, subs_cmd.start)],
     states={
         subs_cmd.SUBSCRIPTIONS: [

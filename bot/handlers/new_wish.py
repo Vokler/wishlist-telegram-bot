@@ -1,5 +1,3 @@
-import logging
-
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler)
 
@@ -64,7 +62,6 @@ class NewWishCommand(AbsHandler):
 
     def cancel(self, update, context):
         """Cancels and ends the conversation."""
-        user = update.message.from_user
         return ConversationHandler.END
 
     def _create_wish_item(self, data):

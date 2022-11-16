@@ -182,6 +182,7 @@ cmd = MyWishesCommand()
 wish_item_update = WishItemUpdate()
 
 my_wishes_conv_handler = ConversationHandler(
+    allow_reentry=True,
     entry_points=[CommandHandler(WishListBotCommands.my_wishes.name, cmd.start)],
     states={
         stages.WISH_ITEMS_LIST.value: [
