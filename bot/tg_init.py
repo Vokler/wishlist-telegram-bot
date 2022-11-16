@@ -1,3 +1,6 @@
+from queue import Queue
+from threading import Thread
+
 from django.conf import settings
 from telegram import Bot
 from telegram.ext import Dispatcher
@@ -16,7 +19,8 @@ def telegram_bot():
 
 def telegram_dispatcher():
     bot = telegram_bot()
-    dispatcher = Dispatcher(bot, None, workers=0)
+    update_queue = Queue()
+    dispatcher = Dispatcher(bot, update_queue)
 
     # Register handlers here
 
@@ -26,8 +30,11 @@ def telegram_dispatcher():
     dispatcher.add_handler(follow_conv_handler)
     dispatcher.add_handler(subs_conv_handler)
 
-    return dispatcher
+    thread = Thread(target=dispatcher.start, name='dispatcher')
+    thread.start()
+
+    return update_queue, dispatcher
 
 
 BOT = telegram_bot()
-DISPATCHER = telegram_dispatcher()
+UPDATE_QUEUE, DISPATCHER = telegram_dispatcher()
