@@ -1,4 +1,3 @@
-from django.utils.translation import gettext_lazy as _
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import PARSEMODE_HTML
 from telegram.ext import (CallbackQueryHandler, CommandHandler,
@@ -24,10 +23,10 @@ class SubscriptionsCommand(AbsHandler):
         if subscriptions_inline:
             keyboard = self._convert_to_list_of_lists(subscriptions_inline)
             reply_markup = InlineKeyboardMarkup(keyboard)
-            text = _('These are the users you are subscribed to:')
+            text = str('These are the users you are subscribed to:')
             update.message.reply_text(text, reply_markup=reply_markup)
         else:
-            text = _(
+            text = str(
                 'You are not subscribed to anyone.\n\n'
                 f'/{WishListBotCommands.follow.value[0]} - {WishListBotCommands.follow.value[1]}'
             )
@@ -41,7 +40,7 @@ class SubscriptionsCommand(AbsHandler):
         subscriptions_inline = self._get_subscriptions()
         keyboard = self._convert_to_list_of_lists(subscriptions_inline)
         reply_markup = InlineKeyboardMarkup(keyboard)
-        text = _('These are the users you are subscribed to:')
+        text = str('These are the users you are subscribed to:')
         query.edit_message_text(text, reply_markup=reply_markup)
         return self.SUBSCRIPTIONS
 
@@ -63,7 +62,7 @@ class SubscriptionsCommand(AbsHandler):
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        text = _(
+        text = str(
             f'Here it is: @{subscription.following.username}.\n'
             'What do you want to do with this subscription?'
         )
@@ -87,7 +86,7 @@ class SubscriptionsCommand(AbsHandler):
         if wish_items.exists():
             text = ''
             for item in wish_items:
-                wish_item_info = _(
+                wish_item_info = str(
                     f'<b>Title</b>: {item.title}\n'
                     f'<b>Image</b>: {"🖼" if item.image else "🚫"}\n'
                     f'<b>Url</b>: {item.url if item.url else "🚫"}\n\n'
@@ -95,7 +94,7 @@ class SubscriptionsCommand(AbsHandler):
                 text += wish_item_info
                 query.edit_message_text(text, reply_markup=reply_markup, parse_mode=PARSEMODE_HTML)
         else:
-            text = _(f'@{subscription.following.username} has not added any wishes yet.')
+            text = str(f'@{subscription.following.username} has not added any wishes yet.')
             query.edit_message_text(text, reply_markup=reply_markup, parse_mode=PARSEMODE_HTML)
 
         return self.SUBSCRIPTION_WISHES
@@ -113,7 +112,7 @@ class SubscriptionsCommand(AbsHandler):
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        text = _(f'You have unsubscribed from @{subscription.following.username}.')
+        text = str(f'You have unsubscribed from @{subscription.following.username}.')
         query.edit_message_text(text, reply_markup=reply_markup)
 
         return self.UNSUBSCRIBE

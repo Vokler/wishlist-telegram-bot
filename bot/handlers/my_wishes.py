@@ -1,4 +1,3 @@
-from django.utils.translation import gettext_lazy as _
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import PARSEMODE_HTML
 from telegram.ext import (CallbackQueryHandler, CommandHandler,
@@ -25,7 +24,7 @@ class WishItemUpdate:
             'wish_item_id': self._get_wish_item_id(query.data),
         })
 
-        text = _(f'OK. Send me the new {field} for your wish.')
+        text = str(f'OK. Send me the new {field} for your wish.')
         query.edit_message_text(text)
         return self.UPDATING_FIELD
 
@@ -52,7 +51,7 @@ class WishItemUpdate:
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        text = _(f'Success! The {field} updated.')
+        text = str(f'Success! The {field} updated.')
         update.message.reply_text(text, reply_markup=reply_markup)
         return stages.WISH_ITEM_UPDATE.value
 
@@ -72,10 +71,10 @@ class MyWishesCommand(AbsHandler):
         if wish_items_inline:
             keyboard = self._convert_to_list_of_lists(wish_items_inline)
             reply_markup = InlineKeyboardMarkup(keyboard)
-            text = _('Choose a wish from the list below:')
+            text = str('Choose a wish from the list below:')
             update.message.reply_text(text, reply_markup=reply_markup)
         else:
-            text = _(
+            text = str(
                 'You haven\'t added any wishes yet.\n\n'
                 f'/{WishListBotCommands.new_wish.value[0]} - {WishListBotCommands.new_wish.value[1]}'
             )
@@ -89,7 +88,7 @@ class MyWishesCommand(AbsHandler):
         wish_items_inline = self._get_wish_items_inline_keyboard()
         keyboard = self._convert_to_list_of_lists(wish_items_inline)
         reply_markup = InlineKeyboardMarkup(keyboard)
-        text = _('Choose a wish from the list below:')
+        text = str('Choose a wish from the list below:')
         query.edit_message_text(text, reply_markup=reply_markup)
         return stages.WISH_ITEMS_LIST.value
 
@@ -110,7 +109,7 @@ class MyWishesCommand(AbsHandler):
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        text = _(
+        text = str(
             f'Here it is: {wish_item.title}.\n'
             'What do you want to do with this wish?'
         )
@@ -137,7 +136,7 @@ class MyWishesCommand(AbsHandler):
             ],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        text = _(
+        text = str(
             f'Edit {wish_item.title} info.\n\n'
             f'<b>Title</b>: {wish_item.title}\n'
             f'<b>Image</b>: {"🖼" if wish_item.image else "🚫"}\n'
@@ -157,7 +156,7 @@ class MyWishesCommand(AbsHandler):
             [InlineKeyboardButton('« Back to Wish List', callback_data=callback.BACK_TO_WISH_ITEMS_LIST.value)],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        text = _(f'You have deleted {wish_item.title}.')
+        text = str(f'You have deleted {wish_item.title}.')
         query.edit_message_text(text, reply_markup=reply_markup)
         return stages.WISH_ITEM_DELETE.value
 

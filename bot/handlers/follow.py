@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
 from telegram.constants import PARSEMODE_HTML
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler)
@@ -14,7 +13,7 @@ class FollowCommand(AbsHandler):
     def start(self, update, context):
         """Starts the conversation and asks the user about the username of a user they want to subscribe to."""
         super(FollowCommand, self).start(update, context)
-        text = _(
+        text = str(
             'Alright, let\'s add a new user to your subscription.\n'
             'Send me a telegram username of user in the following format: @username'
         )
@@ -29,13 +28,13 @@ class FollowCommand(AbsHandler):
             following = User.objects.get(username=username)
             subscription, created = UserFollow.objects.get_or_create(follower=self.user, following=following)
             if created:
-                text = _(f'Done. You\'ve subscribed to {tg_username}.')
-                text_to_following = _(f'@{self.user.username} subscribed to you.')
+                text = str(f'Done. You\'ve subscribed to {tg_username}.')
+                text_to_following = str(f'@{self.user.username} subscribed to you.')
                 context.bot.send_message(chat_id=following.tg_chat_id, text=text_to_following)
             else:
-                text = _(f'You\'ve already subscribed to {tg_username}.')
+                text = str(f'You\'ve already subscribed to {tg_username}.')
         except User.DoesNotExist:
-            text = _(
+            text = str(
                 f'{tg_username} does not use <b>WishListBot</b> bot.\n\n'
                 f'Share the link: {settings.BOT_LINK}'
             )

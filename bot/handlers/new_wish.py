@@ -1,4 +1,3 @@
-from django.utils.translation import gettext_lazy as _
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler)
 
@@ -14,7 +13,7 @@ class NewWishCommand(AbsHandler):
     def start(self, update, context):
         """Starts the conversation and asks the user about title of wish."""
         super(NewWishCommand, self).start(update, context)
-        new_wish_ask_title = _('Alright, a new wish. What do you want to get? Please send me a name of your wish.')
+        new_wish_ask_title = str('Alright, a new wish. What do you want to get? Please send me a name of your wish.')
         update.message.reply_text(str(new_wish_ask_title))
         return self.TITLE
 
@@ -23,7 +22,7 @@ class NewWishCommand(AbsHandler):
         title = update.message.text
         context.chat_data['title'] = title
 
-        new_wish_ask_image = _('Good. Now, send me an image of your wish please, or send /skip if you don\'t want to.')
+        new_wish_ask_image = str('Good. Now, send me an image of your wish please, or send /skip if you don\'t want to.')
         update.message.reply_text(str(new_wish_ask_image))
         return self.IMAGE
 
@@ -32,13 +31,13 @@ class NewWishCommand(AbsHandler):
         image = update.message.photo[-1].get_file()
         context.chat_data['image_url'] = image['file_path']
 
-        text = _('Super. Now, send me an url of your wish if you have it, or send /skip.')
+        text = str('Super. Now, send me an url of your wish if you have it, or send /skip.')
         update.message.reply_text(text)
         return self.URL
 
     def skip_image(self, update, context):
         """Skips the image and asks for an url."""
-        text = _('OK. Now, send me an url of your wish if you have it, or send /skip.')
+        text = str('OK. Now, send me an url of your wish if you have it, or send /skip.')
         update.message.reply_text(text)
         return self.URL
 
@@ -49,7 +48,7 @@ class NewWishCommand(AbsHandler):
 
         self._create_wish_item(context.chat_data)
 
-        text = _('Thank you!')
+        text = str('Thank you!')
         update.message.reply_text(text)
         return ConversationHandler.END
 
@@ -57,7 +56,7 @@ class NewWishCommand(AbsHandler):
         """Skips the url and ends the conversation."""
         self._create_wish_item(context.chat_data)
 
-        text = _('OK. Thank you!')
+        text = str('OK. Thank you!')
         update.message.reply_text(text)
         return ConversationHandler.END
 
