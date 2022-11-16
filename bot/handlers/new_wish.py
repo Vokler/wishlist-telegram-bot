@@ -44,7 +44,7 @@ class NewWishCommand(AbsHandler):
 
     def skip_image(self, update, context):
         """Skips the image and asks for an url."""
-        print('User did not send an image.')
+        logger.warning("User did not send an image.")
 
         text = str('OK. Now, send me an url of your wish if you have it, or send /skip.')
         update.message.reply_text(text)
@@ -63,7 +63,7 @@ class NewWishCommand(AbsHandler):
 
     def skip_url(self, update, context):
         """Skips the url and ends the conversation."""
-        print('User did not send an url.')
+        logger.warning("User did not send an url.")
 
         self._create_wish_item(context.chat_data)
 
@@ -73,6 +73,8 @@ class NewWishCommand(AbsHandler):
 
     def cancel(self, update, context):
         """Cancels and ends the conversation."""
+        user = update.message.from_user
+        logger.warning("User %s canceled the conversation.", user.first_name)
         return ConversationHandler.END
 
     def _create_wish_item(self, data):
