@@ -21,7 +21,7 @@ class SubscriptionsCommand(AbsHandler):
         super(SubscriptionsCommand, self).start(update, context)
         subscriptions_inline = self._get_subscriptions()
         if subscriptions_inline:
-            keyboard = [subscriptions_inline]
+            keyboard = self._convert_to_list_of_lists(subscriptions_inline)
             reply_markup = InlineKeyboardMarkup(keyboard)
             text = str('These are the users you are subscribed to:')
             update.message.reply_text(text, reply_markup=reply_markup)
@@ -38,7 +38,7 @@ class SubscriptionsCommand(AbsHandler):
         query.answer()
 
         subscriptions_inline = self._get_subscriptions()
-        keyboard = [subscriptions_inline]
+        keyboard = self._convert_to_list_of_lists(subscriptions_inline)
         reply_markup = InlineKeyboardMarkup(keyboard)
         text = str('These are the users you are subscribed to:')
         query.edit_message_text(text, reply_markup=reply_markup)
@@ -133,6 +133,15 @@ class SubscriptionsCommand(AbsHandler):
     def _get_subscription_pattern(self, subscription_id):
         pattern = f'{self.BACK_TO_SUBSCRIPTION}{subscription_id}'
         return pattern
+
+    def _convert_to_list_of_lists(self, inline_list):  # todo: make it better
+        if not inline_list:
+            return inline_list
+        K = len(inline_list) // 2 + 1
+        res = []
+        for idx in range(0, K):
+            res.append(inline_list[idx::K])
+        return res
 
 
 subs_cmd = SubscriptionsCommand()

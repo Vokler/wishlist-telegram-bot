@@ -69,7 +69,7 @@ class MyWishesCommand(AbsHandler):
         super(MyWishesCommand, self).start(update, context)
         wish_items_inline = self._get_wish_items_inline_keyboard()
         if wish_items_inline:
-            keyboard = [wish_items_inline]
+            keyboard = self._convert_to_list_of_lists(wish_items_inline)
             reply_markup = InlineKeyboardMarkup(keyboard)
             text = str('Choose a wish from the list below:')
             update.message.reply_text(text, reply_markup=reply_markup)
@@ -86,7 +86,7 @@ class MyWishesCommand(AbsHandler):
         query.answer()
 
         wish_items_inline = self._get_wish_items_inline_keyboard()
-        keyboard = [wish_items_inline]
+        keyboard = self._convert_to_list_of_lists(wish_items_inline)
         reply_markup = InlineKeyboardMarkup(keyboard)
         text = str('Choose a wish from the list below:')
         query.edit_message_text(text, reply_markup=reply_markup)
@@ -176,6 +176,15 @@ class MyWishesCommand(AbsHandler):
     def _get_wish_item_pattern(self, wish_item_id):
         pattern = f'{callback.BACK_TO_WISH_ITEM.value}{wish_item_id}'
         return pattern
+
+    def _convert_to_list_of_lists(self, inline_list):  # todo: make it better
+        if not inline_list:
+            return inline_list
+        K = len(inline_list) // 2 + 1
+        res = []
+        for idx in range(0, K):
+            res.append(inline_list[idx::K])
+        return res
 
 
 cmd = MyWishesCommand()
