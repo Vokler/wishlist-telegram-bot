@@ -65,7 +65,6 @@ class NewWishCommand(AbsHandler):
     def cancel(self, update, context):
         """Cancels and ends the conversation."""
         user = update.message.from_user
-        logger.warning("User %s canceled the conversation.", user.first_name)
         return ConversationHandler.END
 
     def _create_wish_item(self, data):
