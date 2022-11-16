@@ -22,7 +22,7 @@ def telegram_dispatcher():
     # Register handlers here
 
     dispatcher.add_handler(start_handler)
-    dispatcher.add_handler(ch)
+    dispatcher.add_handler(ch, 1)
     # dispatcher.add_handler(new_wish_conv_handler)
     # dispatcher.add_handler(my_wishes_conv_handler)
     # dispatcher.add_handler(follow_conv_handler)
