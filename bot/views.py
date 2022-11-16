@@ -7,8 +7,6 @@ from telegram import Update
 
 from bot.tg_init import BOT, DISPATCHER
 
-logger = logging.getLogger(__name__)
-
 
 @csrf_exempt
 def process(request):

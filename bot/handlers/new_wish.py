@@ -6,8 +6,6 @@ from telegram.ext import (CommandHandler, ConversationHandler, Filters,
 from bot.common import AbsHandler, WishListBotCommands
 from bot.models import WishListItem
 
-logger = logging.getLogger(__name__)
-
 
 class NewWishCommand(AbsHandler):
     TITLE = 'title'
@@ -23,11 +21,8 @@ class NewWishCommand(AbsHandler):
 
     def title(self, update, context):
         """Stores the title and asks for an image."""
-        logger.warning(f'UPDATE: {update}')
         title = update.message.text
-        logger.warning(f'TITLE: {title}')
         context.chat_data['title'] = title
-        logger.warning('AFTER CONTEXT')
 
         text = str('Good. Now, send me an image of your wish please, or send /skip if you don\'t want to.')
         update.message.reply_text(text)
@@ -44,8 +39,6 @@ class NewWishCommand(AbsHandler):
 
     def skip_image(self, update, context):
         """Skips the image and asks for an url."""
-        logger.warning("User did not send an image.")
-
         text = str('OK. Now, send me an url of your wish if you have it, or send /skip.')
         update.message.reply_text(text)
         return self.URL
@@ -63,8 +56,6 @@ class NewWishCommand(AbsHandler):
 
     def skip_url(self, update, context):
         """Skips the url and ends the conversation."""
-        logger.warning("User did not send an url.")
-
         self._create_wish_item(context.chat_data)
 
         text = str('OK. Thank you!')

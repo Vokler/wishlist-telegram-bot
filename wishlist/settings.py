@@ -121,12 +121,12 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
         'file': {
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'class': 'logging.FileHandler',
             'filename': LOG_FILE,
             'formatter': 'verbose',
@@ -143,7 +143,7 @@ LOGGING = {
         },
         'telegram': {
             'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': 'WARNING',
         },
         'bot': {
             'handlers': ['file'],
