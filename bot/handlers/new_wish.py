@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from telegram.ext import (CommandHandler, ConversationHandler, Filters,
                           MessageHandler)
 
@@ -13,8 +14,8 @@ class NewWishCommand(AbsHandler):
     def start(self, update, context):
         """Starts the conversation and asks the user about title of wish."""
         super(NewWishCommand, self).start(update, context)
-        text = str('Alright, a new wish. What do you want to get? Please send me a name of your wish.')
-        update.message.reply_text(text)
+        new_wish_ask_title = _('Alright, a new wish. What do you want to get? Please send me a name of your wish.')
+        update.message.reply_text(str(new_wish_ask_title))
         return self.TITLE
 
     def title(self, update, context):
@@ -22,8 +23,8 @@ class NewWishCommand(AbsHandler):
         title = update.message.text
         context.chat_data['title'] = title
 
-        text = str('Good. Now, send me an image of your wish please, or send /skip if you don\'t want to.')
-        update.message.reply_text(text)
+        new_wish_ask_image = _('Good. Now, send me an image of your wish please, or send /skip if you don\'t want to.')
+        update.message.reply_text(str(new_wish_ask_image))
         return self.IMAGE
 
     def image(self, update, context):
