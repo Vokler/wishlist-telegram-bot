@@ -32,13 +32,13 @@ class NewWishCommand(AbsHandler):
         image = update.message.photo[-1].get_file()
         context.chat_data['image_url'] = image['file_path']
 
-        text = str('Super. Now, send me an url of your wish if you have it, or send /skip.')
+        text = _('Super. Now, send me an url of your wish if you have it, or send /skip.')
         update.message.reply_text(text)
         return self.URL
 
     def skip_image(self, update, context):
         """Skips the image and asks for an url."""
-        text = str('OK. Now, send me an url of your wish if you have it, or send /skip.')
+        text = _('OK. Now, send me an url of your wish if you have it, or send /skip.')
         update.message.reply_text(text)
         return self.URL
 
@@ -49,7 +49,7 @@ class NewWishCommand(AbsHandler):
 
         self._create_wish_item(context.chat_data)
 
-        text = str('Thank you!')
+        text = _('Thank you!')
         update.message.reply_text(text)
         return ConversationHandler.END
 
@@ -57,7 +57,7 @@ class NewWishCommand(AbsHandler):
         """Skips the url and ends the conversation."""
         self._create_wish_item(context.chat_data)
 
-        text = str('OK. Thank you!')
+        text = _('OK. Thank you!')
         update.message.reply_text(text)
         return ConversationHandler.END
 

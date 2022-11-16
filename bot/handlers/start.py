@@ -6,7 +6,7 @@ from bot.utils import get_or_create_user, set_language
 
 
 def start(update, context):
-    set_language(update.message.from_user)
+    # set_language(update.message.from_user)
     text = str(
         'I\'m <b>WishListBot</b> and I can help you to share your wishes or find out what others want to.\n\n'
         'You can control me by sending these commands:\n\n'
