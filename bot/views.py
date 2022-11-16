@@ -12,12 +12,8 @@ logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def process(request):
-    logger.warning(f'REQUEST: {request.body.decode()}')
     data = json.loads(request.body.decode())
     update = Update.de_json(data, BOT)
-    try:
-        DISPATCHER.process_update(update)
-    except Exception as e:
-        logger.warning(f'ERROR: {e}')
+    DISPATCHER.process_update(update)
 
     return JsonResponse({})
