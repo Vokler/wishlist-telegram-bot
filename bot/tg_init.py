@@ -7,6 +7,7 @@ from bot.handlers.my_wishes import my_wishes_conv_handler
 from bot.handlers.new_wish import new_wish_conv_handler
 from bot.handlers.start import start_handler
 from bot.handlers.subscriptions import subs_conv_handler
+from bot.handlers.new_wish_test import ch
 
 
 def telegram_bot():
@@ -21,10 +22,11 @@ def telegram_dispatcher():
     # Register handlers here
 
     dispatcher.add_handler(start_handler)
-    dispatcher.add_handler(new_wish_conv_handler)
-    dispatcher.add_handler(my_wishes_conv_handler)
-    dispatcher.add_handler(follow_conv_handler)
-    dispatcher.add_handler(subs_conv_handler)
+    dispatcher.add_handler(ch)
+    # dispatcher.add_handler(new_wish_conv_handler)
+    # dispatcher.add_handler(my_wishes_conv_handler)
+    # dispatcher.add_handler(follow_conv_handler)
+    # dispatcher.add_handler(subs_conv_handler)
 
     return dispatcher
 
