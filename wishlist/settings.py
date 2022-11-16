@@ -97,66 +97,12 @@ WSGI_APPLICATION = 'wishlist.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': env('DATABASE_NAME'),
-#         'USER': env('DATABASE_USER'),
-#         'PASSWORD': env('DATABASE_PASSWORD'),
-#         'HOST': env('DATABASE_HOST'),
-#         'PORT': env('DATABASE_PORT'),
-#     }
-# }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
-
-# Logging
-
-LOG_FILE = BASE_DIR / '../logging/file.log'
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[%(asctime)s] %(levelname)s %(name)s (%(lineno)d) %(message)s',
-        }
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': LOG_FILE,
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-        'django': {
-            'handlers': ['file'],
-            'level': 'WARNING',
-        },
-        'telegram': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-        },
-        'bot': {
-            'handlers': ['file'],
-            'level': 'WARNING',
-        }
-    },
 }
 
 # Password validation
