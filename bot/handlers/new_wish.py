@@ -19,7 +19,7 @@ class NewWishCommand(AbsHandler):
         super(NewWishCommand, self).start(update, context)
         text = str('Alright, a new wish. What do you want to get? Please send me a name of your wish.')
         update.message.reply_text(text)
-        return self.TITLE
+        return 'title'
 
     def title(self, update, context):
         """Stores the title and asks for an image."""
@@ -87,7 +87,7 @@ new_wish_cmd = NewWishCommand()
 new_wish_conv_handler = ConversationHandler(
     entry_points=[CommandHandler(WishListBotCommands.new_wish.name, new_wish_cmd.start)],
     states={
-        new_wish_cmd.TITLE: [MessageHandler(Filters.text, new_wish_cmd.title)],
+        'title': [MessageHandler(Filters.text, new_wish_cmd.title)],
         new_wish_cmd.IMAGE: [
             MessageHandler(Filters.photo, new_wish_cmd.image),
             CommandHandler('skip', new_wish_cmd.skip_image)
