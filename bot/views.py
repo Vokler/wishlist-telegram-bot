@@ -15,6 +15,9 @@ def process(request):
     logger.warning(f'REQUEST: {request.body.decode()}')
     data = json.loads(request.body.decode())
     update = Update.de_json(data, BOT)
-    DISPATCHER.process_update(update)
+    try:
+        DISPATCHER.process_update(update)
+    except Exception as e:
+        logger.warning(f'ERROR: {e}')
 
     return JsonResponse({})
