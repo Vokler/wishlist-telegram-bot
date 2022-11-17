@@ -1,5 +1,5 @@
 import os
-import urllib
+import urllib.request
 
 from django.contrib.auth.models import AbstractUser
 from django.core.files import File
