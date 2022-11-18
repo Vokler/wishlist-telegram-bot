@@ -160,6 +160,9 @@ class MyWishesCommand(AbsHandler):
         query.edit_message_text(text, reply_markup=reply_markup)
         return stages.WISH_ITEM_DELETE.value
 
+    def cancel(self, update, context):
+        return ConversationHandler.END
+
     def _get_wish_items_inline_keyboard(self):
         wish_items = WishListItem.objects.filter(user=self.user)
         wish_items_inline_keyboard = []
@@ -216,5 +219,5 @@ my_wishes_conv_handler = ConversationHandler(
             CallbackQueryHandler(cmd.wish_item, pattern=f'^{callback.BACK_TO_WISH_ITEM.value}[0-9]+$'),
         ]
     },
-    fallbacks=[CommandHandler('start', start_handler)]
+    fallbacks=[CommandHandler('cancel', cmd.cancel)]
 )

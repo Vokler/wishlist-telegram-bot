@@ -117,6 +117,9 @@ class SubscriptionsCommand(AbsHandler):
 
         return self.UNSUBSCRIBE
 
+    def cancel(self, update, context):
+        return ConversationHandler.END
+
     def _get_subscriptions(self):
         subscriptions = self.user.who_is_followed.all()
         subscriptions_inline_keyboard = []
@@ -164,5 +167,5 @@ subs_conv_handler = ConversationHandler(
             CallbackQueryHandler(subs_cmd.subscriptions, pattern=subs_cmd.BACK_TO_SUBSCRIPTIONS),
         ]
     },
-    fallbacks=[CommandHandler('start', start_handler)]
+    fallbacks=[CommandHandler('cancel', subs_cmd.cancel)]
 )
