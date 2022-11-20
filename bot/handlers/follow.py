@@ -28,11 +28,17 @@ class FollowCommand(AbsHandler):
             following = User.objects.get(username=username)
             subscription, created = UserFollow.objects.get_or_create(follower=self.user, following=following)
             if created:
-                text = str(f'Done. You\'ve subscribed to {tg_username}.')
+                text = str(
+                    f'Done. You\'ve subscribed to {tg_username}.\n\n'
+                    f'If you want to see what this user wants to get, send /subscriptions'
+                )
                 text_to_following = str(f'@{self.user.username} subscribed to you.')
                 context.bot.send_message(chat_id=following.tg_chat_id, text=text_to_following)
             else:
-                text = str(f'You\'ve already subscribed to {tg_username}.')
+                text = str(
+                    f'You\'ve already subscribed to {tg_username}.\n\n'
+                    f'If you want to see what this user wants to get, send /subscriptions'
+                )
         except User.DoesNotExist:
             text = str(
                 f'{tg_username} does not use <b>WishListBot</b> bot.\n\n'
