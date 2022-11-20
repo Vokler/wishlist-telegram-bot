@@ -48,7 +48,10 @@ class NewWishCommand(AbsHandler):
 
         self._create_wish_item(context.chat_data)
 
-        text = str('Thank you!')
+        text = str(
+            'Thank you! You\'ve added a wish to you WishList.\n'
+            f'/{WishListBotCommands.my_wishes.name} - to view your WishList.'
+        )
         update.message.reply_text(text)
         return ConversationHandler.END
 
@@ -56,7 +59,10 @@ class NewWishCommand(AbsHandler):
         """Skips the url and ends the conversation."""
         self._create_wish_item(context.chat_data)
 
-        text = str('OK. Thank you!')
+        text = str(
+            'OK. Thank you! You\'ve added a wish to you WishList.\n'
+            f'/{WishListBotCommands.my_wishes.name} - to view your WishList.'
+        )
         update.message.reply_text(text)
         return ConversationHandler.END
 
