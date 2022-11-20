@@ -49,7 +49,7 @@ class NewWishCommand(AbsHandler):
         self._create_wish_item(context.chat_data)
 
         text = str(
-            'Thank you! You\'ve added a wish to you WishList.\n'
+            'Thank you! You\'ve added a wish to your WishList.\n\n'
             f'/{WishListBotCommands.my_wishes.name} - to view your WishList.'
         )
         update.message.reply_text(text)
@@ -60,7 +60,7 @@ class NewWishCommand(AbsHandler):
         self._create_wish_item(context.chat_data)
 
         text = str(
-            'OK. Thank you! You\'ve added a wish to you WishList.\n'
+            'OK. Thank you! You\'ve added a wish to your WishList.\n\n'
             f'/{WishListBotCommands.my_wishes.name} - to view your WishList.'
         )
         update.message.reply_text(text)
