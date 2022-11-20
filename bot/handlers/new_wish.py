@@ -13,8 +13,8 @@ class NewWishCommand(AbsHandler):
     def start(self, update, context):
         """Starts the conversation and asks the user about title of wish."""
         super(NewWishCommand, self).start(update, context)
-        new_wish_ask_title = str('Alright, a new wish. What do you want to get? Please send me a name of your wish.')
-        update.message.reply_text(str(new_wish_ask_title))
+        text = str('Alright, a new wish. What do you want to get? Please send me a name of your wish.')
+        update.message.reply_text(text)
         return self.TITLE
 
     def title(self, update, context):
@@ -22,8 +22,8 @@ class NewWishCommand(AbsHandler):
         title = update.message.text
         context.chat_data['title'] = title
 
-        new_wish_ask_image = str('Good. Now, send me an image of your wish please, or send /skip if you don\'t want to.')
-        update.message.reply_text(str(new_wish_ask_image))
+        text = str('Good. Now, send me an image of your wish please, or send /skip if you don\'t want to.')
+        update.message.reply_text(text)
         return self.IMAGE
 
     def image(self, update, context):

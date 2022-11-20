@@ -4,7 +4,6 @@ from telegram.ext import (CallbackQueryHandler, CommandHandler,
                           ConversationHandler)
 
 from bot.common import AbsHandler, WishListBotCommands
-from bot.handlers.start import start_handler
 from bot.models import UserFollow
 
 

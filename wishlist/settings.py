@@ -13,8 +13,6 @@ from pathlib import Path
 
 import environ
 
-# from django.utils.translation import gettext_lazy as _
-
 env = environ.Env(
     DEBUG=(bool),
     SECRET_KEY=(str),
@@ -176,11 +174,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-# LANGUAGES = [
-#     ('en-us', _('English')),
-#     ('ru', _('Russian')),
-# ]
-# LOCALE_PATHS = (f'{BASE_DIR}/locale',)
 
 TIME_ZONE = 'UTC'
 

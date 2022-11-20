@@ -5,7 +5,6 @@ from telegram.ext import (CallbackQueryHandler, CommandHandler,
 
 from bot.common import (AbsHandler, MyWishesCallback, MyWishesStages,
                         WishListBotCommands)
-from bot.handlers.start import start_handler
 from bot.models import WishListItem
 
 stages = MyWishesStages
